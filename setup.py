@@ -9,7 +9,7 @@ setup(
     long_description='See the GitHub page for more information.',
     include_package_data=True,
     install_requires=[
-        'pypairtree==1.0.0',
+        'pypairtree==1.1.0',
         'flask==1.0.2',
     ],
     zip_safe=False,
