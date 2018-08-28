@@ -1,4 +1,4 @@
-Aubrey-transcription
+Aubrey-transcription [![Build Status](https://www.travis-ci.com/unt-libraries/aubrey-transcription.svg?branch=master)](https://www.travis-ci.com/unt-libraries/aubrey-transcription)
 ====================
 
 
