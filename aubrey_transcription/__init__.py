@@ -1,4 +1,6 @@
 import os
+import re
+
 from flask import Flask
 
 from . import aubrey_transcription
@@ -22,5 +24,8 @@ def create_app(test_config=None, instance_path=None):
         app.config.from_mapping(test_config)
 
     app.register_blueprint(aubrey_transcription.bp)
+
+    # Compile and save the regex pattern so we don't have to do it for every request.
+    app.config['FILENAME_REGEX'] = re.compile(app.config['FILENAME_PATTERN'])
 
     return app

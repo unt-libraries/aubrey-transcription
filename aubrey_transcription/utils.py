@@ -32,12 +32,12 @@ def get_files_info(pairpath, files):
     pairtree_base = current_app.config['PAIRTREE_BASE']
     transcription_url = current_app.config['TRANSCRIPTION_URL']
     files_info = []
-    for file in files:
-        extension = file.split('.')[-1]
+    for filename in files:
+        extension = filename.split('.')[-1]
         if extension in extensions_meta:
-            file_path = os.path.join(pairpath, file)
-            filename_dict = decrypt_filename(file)
-            if filename_dict == {}:
+            file_path = os.path.join(pairpath, filename)
+            filename_dict = decrypt_filename(filename)
+            if not filename_dict:
                 continue
             local_flocat = os.path.normpath('{}{}{}'.format(pairtree_base, os.sep, file_path))
             try:
@@ -59,20 +59,8 @@ def get_files_info(pairpath, files):
 
 def decrypt_filename(filename):
     """Break apart a transcription filename into it's various parts."""
-    # Maybe use regex?
-    try:
-        metaid, remainder = filename.split('_', 1)
-        manifestation, remainder = remainder.split('_', 1)
-        fileset, remainder = remainder.split('-', 1)
-        kind, remainder = remainder.split('-', 1)
-        language, extension = remainder.split('.', 1)
-    except ValueError:
-        return {}
-    return {
-        'metaid': metaid,
-        'manifestation': manifestation,
-        'fileset': fileset,
-        'kind': kind,
-        'language': language,
-        'extension': extension,
-    }
+    filename_regex = current_app.config['FILENAME_REGEX']
+    filename_match = filename_regex.match(filename)
+    if filename_match:
+        return filename_match.groupdict()
+    return {}

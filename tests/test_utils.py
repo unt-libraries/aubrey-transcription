@@ -1,9 +1,14 @@
 from __future__ import unicode_literals
+import re
 
 import pytest
 import mock
 
 from aubrey_transcription.utils import make_path, find_files, get_files_info, decrypt_filename
+
+
+FILENAME_REGEX = re.compile(r'(?P<metaid>[^_]*)_(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
+                            r'-(?P<kind>[^-]*)-(?P<language>[^.]*)\.(?P<extension>.*)')
 
 
 class TestMakePath():
@@ -23,24 +28,17 @@ class TestFindFiles():
     @pytest.mark.parametrize('expected', [
         ['one.vtt'],
         ['one.vtt', 'two.xml', 'three.jpg'],
+        [],
     ])
     @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_good_path_with_files(self, mock_listdir, mock_current_app, mock_isdir, expected):
+    def test_path_is_dir(self, mock_listdir, mock_current_app, mock_isdir, expected):
         pairpath = '/so/me/pa/th/somepath'
         mock_isdir.return_value = True
         mock_listdir.return_value = expected
         result = find_files(pairpath)
         assert result == expected
 
-    @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_good_path_without_files(self, mock_listdir, mock_current_app, mock_isdir):
-        pairpath = '/so/me/fi/le/somefile'
-        mock_isdir.return_value = True
-        mock_listdir.return_value = []
-        result = find_files(pairpath)
-        assert result == []
-
-    def test_bad_path(self, mock_current_app, mock_isdir):
+    def test_path_is_not_dir(self, mock_current_app, mock_isdir):
         pairpath = '/so/me/fi/le/somefile'
         mock_isdir.return_value = False
         result = find_files(pairpath)
@@ -113,6 +111,7 @@ class TestGetFilesInfo():
         assert result == []
 
 
+@mock.patch('aubrey_transcription.utils.current_app', config={'FILENAME_REGEX': FILENAME_REGEX})
 class TestDecryptFilename():
     @pytest.mark.parametrize('filename,expected', [
         (
@@ -138,7 +137,7 @@ class TestDecryptFilename():
             }
         ),
     ])
-    def test_compliant_filename(self, filename, expected):
+    def test_compliant_filename(self, mock_current_app, filename, expected):
         result = decrypt_filename(filename)
         assert result == expected
 
@@ -147,6 +146,6 @@ class TestDecryptFilename():
         'bad',
         'this_is_missing-an-extension',
     ])
-    def test_noncompliant_filename(self, filename):
+    def test_noncompliant_filename(self, mock_current_app, filename):
         result = decrypt_filename(filename)
         assert result == {}

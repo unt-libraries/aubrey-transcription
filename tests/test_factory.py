@@ -12,6 +12,7 @@ class TestCreateApp:
             "PAIRTREE_BASE = '/different/path'"
             "\nTRANSCRIPTION_URL = 'http://someothersite.com'"
             "\nEXTENSIONS_META = {'txt': {'use': 'text', 'mimetype': 'text'}}"
+            "\nFILENAME_PATTERN = 'some regex'"
         )
         fn = tmpdir_factory.mktemp('data').join('settings.py')
         fn.write(settings)
@@ -31,22 +32,22 @@ class TestCreateApp:
         assert app.config['PAIRTREE_BASE'] == default_settings.PAIRTREE_BASE
         assert app.config['TRANSCRIPTION_URL'] == default_settings.TRANSCRIPTION_URL
         assert app.config['EXTENSIONS_META'] == default_settings.EXTENSIONS_META
+        assert app.config['FILENAME_PATTERN'] == default_settings.FILENAME_PATTERN
 
     def test_instance_file_overrides_default_settings(self, mock_makedirs, settings_file):
         app = create_app(instance_path=settings_file.dirname)
-        assert app.config['PAIRTREE_BASE'] != default_settings.PAIRTREE_BASE
         assert app.config['PAIRTREE_BASE'] == '/different/path'
-        assert app.config['TRANSCRIPTION_URL'] != default_settings.TRANSCRIPTION_URL
         assert app.config['TRANSCRIPTION_URL'] == 'http://someothersite.com'
-        assert app.config['EXTENSIONS_META'] != default_settings.EXTENSIONS_META
         assert app.config['EXTENSIONS_META'] == {'txt': {'use': 'text', 'mimetype': 'text'}}
+        assert app.config['FILENAME_PATTERN'] == 'some regex'
 
     def test_settings_passed_in_overrides_instance_file(self, mock_makedirs, settings_file):
         app = create_app(
             test_config={'PAIRTREE_BASE': '/right/here', 'TRANSCRIPTION_URL': 'something.com',
-                         'EXTENSIONS_META': {}},
+                         'EXTENSIONS_META': {}, 'FILENAME_PATTERN': 'a pattern'},
             instance_path=settings_file.dirname
         )
         assert app.config['PAIRTREE_BASE'] == '/right/here'
         assert app.config['TRANSCRIPTION_URL'] == 'something.com'
         assert app.config['EXTENSIONS_META'] == {}
+        assert app.config['FILENAME_PATTERN'] == 'a pattern'
