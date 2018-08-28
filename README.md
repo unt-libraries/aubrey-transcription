@@ -15,9 +15,9 @@ structure.
 Requirements
 --------------------
 
-* Python 2.7
+* Python 2.7, 3.4, 3.5, or 3.6
 * Flask 1.0.2
-* pypairtree 1.0.0
+* pypairtree 1.1.0
 
 
 Developing/Testing
@@ -84,7 +84,8 @@ directions to start developing/testing.
 6. You may now visit the app by visiting the location given to you after running the
    previous command, which should be something like "http://127.0.0.1/5000/".
 
-7. To run the test suite, do the following, which will also generate the coverage report.
+7. To run the test suite against your current version of Python (whatever is in your virtualenv),
+   do the following, which will also generate the coverage report.
     ```sh
         coverage run -m pytest
     ```
@@ -92,6 +93,12 @@ directions to start developing/testing.
 8. You may view the coverage report after running the tests.
     ```sh
         coverage report -m
+    ```
+
+9. If you have multiple of the compatible versions of Python installed, then you can test against 
+   them all with tox.
+    ```sh
+        tox
     ```
 
 
