@@ -25,7 +25,7 @@ Developing/Testing
 
 In order to start developing or run the tests, it is recommended that you set up
 a virtual environment specifically for aubrey-transcription. To do so, download
-virtualenv and then set up a virtual environment with Python 2.7 according to the
+virtualenv and then set up a virtual environment with Python according to the
 documentation.
 
 One you have a virtual environment, activate it and proceed with the following
@@ -43,11 +43,11 @@ directions to start developing/testing.
     ```
 
 3. Provide the proper configuration settings. This will be specific to how you
-   are using this application. There are 4 main settings that should be configured
+   are using this application. There are 5 main settings that should be configured
    properly, either by modifying the "default_settings.py" file in the
    aubrey_transcription package or by creating a directory called "instance" at the
    root of the project and putting a new file called "settings.py" there with the
-   following 4 settings:
+   following 5 settings:
 
    SECRET_KEY: This string is fine to just leave as "dev" for development and testing,
    but MUST be changed to be more secure when being used in a production setting.
@@ -67,6 +67,11 @@ directions to start developing/testing.
    The value for the key is another dictionary that has "use" and "mimetype" keys with
    their appropriate string values.
 
+   FILENAME_PATTERN: This is a Python regex pattern string that is used to parse the
+   transcription filenames into their various parts such as language, extensions, etc.
+   All transcription filenames MUST follow the pattern described by this string or they
+   will be ignored.
+
    Please see "default_settings.py" for an example of how a settings file should look.
 
 4. Set the following two environment variables so that Flask knows which app to run and
@@ -82,7 +87,9 @@ directions to start developing/testing.
     ```
 
 6. You may now visit the app by visiting the location given to you after running the
-   previous command, which should be something like "http://127.0.0.1/5000/".
+   previous command, which should be something like "http://127.0.0.1:5000/identifier/",
+   with "identifier" replaced by an existing identifier whose transcriptions can be found
+   in your local pairtree.
 
 7. To run the test suite against your current version of Python (whatever is in your virtualenv),
    do the following, which will also generate the coverage report.
