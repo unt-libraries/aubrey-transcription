@@ -70,10 +70,10 @@ class TestGetFilesInfo():
         mock_getsize.return_value = 256
         expected = [
             {
-                'mimetype': 'text/vtt',
-                'use': 'vtt',
+                'MIMETYPE': 'text/vtt',
+                'USE': 'vtt',
                 'flocat': 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt',
-                'file_size': 256,
+                'SIZE': 256,
                 'vtt_kind': 'captions',
                 'language': 'eng',
             }
