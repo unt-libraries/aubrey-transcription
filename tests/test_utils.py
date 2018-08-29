@@ -64,41 +64,58 @@ class TestGetFilesInfo():
         pairpath = '/pa/th/path'
         files = ['metaid_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {
+            'manifestation': '1',
+            'fileset': '1',
             'kind': 'captions',
             'language': 'eng',
         }
         mock_getsize.return_value = 256
-        expected = [
-            {
-                'MIMETYPE': 'text/vtt',
-                'USE': 'vtt',
-                'flocat': 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt',
-                'SIZE': 256,
-                'vtt_kind': 'captions',
-                'language': 'eng',
+        expected = {
+            '1': {
+                '1': [
+                    {
+                        'MIMETYPE': 'text/vtt',
+                        'USE': 'vtt',
+                        'flocat': 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt',
+                        'SIZE': 256,
+                        'vtt_kind': 'captions',
+                        'language': 'eng',
+                    }
+                ]
             }
-        ]
+        }
         result = get_files_info(pairpath, files)
         assert result == expected
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_removes_bad_extensions(self, mock_getsize, mock_current_app, mock_decrypt_filename):
         pairpath = '/pa/th/path'
-        files = ['id_m1_1-captions-eng.vtt', 'id_m3_1-captions-ger.txt', 'id_m2_1-captions-fr.vtt']
-        mock_decrypt_filename.return_value = {'kind': 'captions', 'language': 'eng'}
+        files = ['id_m1_1-captions-eng.vtt', 'id_m1_1-captions-ger.txt', 'id_m1_1-captions-fr.vtt']
+        mock_decrypt_filename.return_value = {
+            'manifestation': '1',
+            'fileset': '1',
+            'kind': 'captions',
+            'language': 'eng'
+        }
         mock_getsize.return_value = 256
         result = get_files_info(pairpath, files)
-        assert len(result) == 2
-        assert result[0]['flocat'].endswith('.vtt') and result[1]['flocat'].endswith('.vtt')
+        assert len(result['1']['1']) == 2
+        assert result['1']['1'][0]['flocat'].endswith('.vtt')
+        assert result['1']['1'][1]['flocat'].endswith('.vtt')
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_path_does_not_exist(self, mock_getsize, mock_current_app, mock_decrypt_filename):
         pairpath = '/pa/th/path'
         files = ['id_m1_1-captions-eng.vtt']
-        mock_decrypt_filename.return_value = {'kind': 'captions', 'language': 'eng'}
+        mock_decrypt_filename.return_value = {
+            'manifestation': '1',
+            'fileset': '1',
+            'kind': 'captions',
+            'language': 'eng'
+        }
         mock_getsize.side_effect = OSError
         result = get_files_info(pairpath, files)
-        assert result == []
+        assert result == {}
 
     @pytest.mark.parametrize('files', [
         ['two'],
@@ -108,7 +125,7 @@ class TestGetFilesInfo():
         pairpath = '/pa/th/path'
         mock_decrypt_filename.return_value = {}
         result = get_files_info(pairpath, files)
-        assert result == []
+        assert result == {}
 
 
 @mock.patch('aubrey_transcription.utils.current_app', config={'FILENAME_REGEX': FILENAME_REGEX})

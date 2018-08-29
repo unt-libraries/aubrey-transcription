@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import os
+from collections import defaultdict
 
 from pypairtree import pairtree
 from flask import current_app
@@ -31,7 +32,7 @@ def get_files_info(pairpath, files):
     extensions_meta = current_app.config['EXTENSIONS_META']
     pairtree_base = current_app.config['PAIRTREE_BASE']
     transcription_url = current_app.config['TRANSCRIPTION_URL']
-    files_info = []
+    files_info = defaultdict(lambda: defaultdict(list))
     for filename in files:
         extension = filename.split('.')[-1]
         if extension in extensions_meta:
@@ -52,7 +53,7 @@ def get_files_info(pairpath, files):
                 'vtt_kind': filename_dict['kind'],
                 'language': filename_dict['language'],
             }
-            files_info.append(file_info)
+            files_info[filename_dict['manifestation']][filename_dict['fileset']].append(file_info)
 
     return files_info
 
