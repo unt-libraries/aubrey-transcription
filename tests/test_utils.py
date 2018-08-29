@@ -88,6 +88,34 @@ class TestGetFilesInfo():
         assert result == expected
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
+    def test_manifestation_and_fileset_structure(self, mock_getsize, mock_current_app,
+                                                 mock_decrypt_filename):
+        pairpath = '/pa/th/path'
+        files = [
+            'metaid_m1_8-captions-eng.vtt',
+            'metaid_m2_5-captions-ger.vtt'
+        ]
+        mock_decrypt_filename.side_effect = [
+            {
+                'manifestation': '1',
+                'fileset': '8',
+                'kind': 'captions',
+                'language': 'eng',
+            },
+            {
+                'manifestation': '2',
+                'fileset': '5',
+                'kind': 'captions',
+                'language': 'ger',
+            }
+        ]
+        mock_getsize.return_value = 256
+        result = get_files_info(pairpath, files)
+        assert result['1']['8']
+        assert result['2']['5']
+        assert not result['1']['1']
+
+    @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_removes_bad_extensions(self, mock_getsize, mock_current_app, mock_decrypt_filename):
         pairpath = '/pa/th/path'
         files = ['id_m1_1-captions-eng.vtt', 'id_m1_1-captions-ger.txt', 'id_m1_1-captions-fr.vtt']
