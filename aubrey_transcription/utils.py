@@ -45,10 +45,10 @@ def get_files_info(pairpath, files):
             except OSError:
                 continue
             file_info = {
-                'mimetype': extensions_meta[extension]['mimetype'],
-                'use': extensions_meta[extension]['use'],
+                'MIMETYPE': extensions_meta[extension]['mimetype'],
+                'USE': extensions_meta[extension]['use'],
                 'flocat': '{}{}'.format(transcription_url, file_path),
-                'file_size': file_size,
+                'SIZE': file_size,
                 'vtt_kind': filename_dict['kind'],
                 'language': filename_dict['language'],
             }
