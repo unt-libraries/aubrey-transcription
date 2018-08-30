@@ -87,6 +87,27 @@ class TestGetFilesInfo():
         result = get_files_info(pairpath, files)
         assert result == expected
 
+    @pytest.mark.parametrize('transcription_url', [
+        'http://example.com',
+        'http://example.com/'
+    ])
+    @mock.patch('aubrey_transcription.utils.os.path.getsize')
+    def test_flocat_has_single_slash(self, mock_getsize, mock_current_app, mock_decrypt_filename,
+                                     transcription_url):
+        mock_current_app.config[''] = transcription_url
+        pairpath = '/pa/th/path'
+        files = ['metaid_m1_1-captions-eng.vtt']
+        mock_decrypt_filename.return_value = {
+            'manifestation': '1',
+            'fileset': '1',
+            'kind': 'captions',
+            'language': 'eng',
+        }
+        mock_getsize.return_value = 256
+        expected_flocat = 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt'
+        result = get_files_info(pairpath, files)
+        assert result['1']['1'][0]['flocat'] == expected_flocat
+
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_manifestation_and_fileset_structure(self, mock_getsize, mock_current_app,
                                                  mock_decrypt_filename):
