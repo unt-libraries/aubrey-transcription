@@ -7,5 +7,5 @@ EXTENSIONS_META = {
         'use': 'vtt',
     },
 }
-FILENAME_PATTERN = (r'(?P<metaid>[^_]*)_(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
+FILENAME_PATTERN = (r'(?P<metaid>[^_]*)_m?(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
                     r'-(?P<kind>[^-]*)-(?P<language>[^.]*)\.(?P<extension>.*)')
