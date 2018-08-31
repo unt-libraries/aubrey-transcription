@@ -77,7 +77,7 @@ class TestGetFilesInfo():
                         'MIMETYPE': 'text/vtt',
                         'USE': 'vtt',
                         'flocat': 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt',
-                        'SIZE': 256,
+                        'SIZE': '256',
                         'vtt_kind': 'captions',
                         'language': 'eng',
                     }

@@ -49,7 +49,7 @@ def get_files_info(pairpath, files):
                 'MIMETYPE': extensions_meta[extension]['mimetype'],
                 'USE': extensions_meta[extension]['use'],
                 'flocat': '{}{}'.format(transcription_url.rstrip('/'), file_path),
-                'SIZE': file_size,
+                'SIZE': str(file_size),
                 'vtt_kind': filename_dict['kind'],
                 'language': filename_dict['language'],
             }
