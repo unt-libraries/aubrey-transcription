@@ -20,7 +20,7 @@ class TestListFiles:
         mock_find_files.return_value = None
         mock_get_files_info.return_value = None
         response = client.get('/metadc123456')  # No trailing slash.
-        assert response.status_code == 301
+        assert response.status_code == 308
 
     @mock.patch('aubrey_transcription.aubrey_transcription.get_files_info')
     @mock.patch('aubrey_transcription.aubrey_transcription.find_files')
