@@ -7,13 +7,16 @@ matrix:
       env: TOX_ENV=py27
 
     - python: 3.4
-      env: TOX_ENV=py27
+      env: TOX_ENV=py34
 
     - python: 3.5
       env: TOX_ENV=py35
 
     - python: 3.6
-      env: TOX_ENV=py36,py36-flake8,py36-coverage
+      env: TOX_ENV=py36
+
+    - python: 3.7
+      env: TOX_ENV=py37,py37-flake8,py37-coverage
 install:
     pip install tox
 script:
