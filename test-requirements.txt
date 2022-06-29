@@ -1,5 +1,5 @@
 pypairtree == 1.1.0
-flask == 1.1.4
+flask == 2.0.0
 pytest == 3.7.1
 coverage == 4.5.1
 mock == 2.0.0
