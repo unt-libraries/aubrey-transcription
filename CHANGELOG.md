@@ -10,6 +10,7 @@ x.x.x
 * Replaced Travis with GitHub Actions.
 * Dropped support for 2.7 and 3.4-3.5.
 * Added Python 3.8 and 3.9 testing.
+* Upgraded Flask to 2.0.3.
 
 
 1.0.0

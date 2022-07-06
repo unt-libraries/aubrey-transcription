@@ -16,7 +16,7 @@ Requirements
 --------------------
 
 * Python 3.6 - 3.7
-* Flask 1.0.2
+* Flask 2.0.3
 * pypairtree 1.1.0
 
 
