@@ -1,4 +1,4 @@
-Aubrey-transcription [![Build Status](https://www.travis-ci.com/unt-libraries/aubrey-transcription.svg?branch=master)](https://www.travis-ci.com/unt-libraries/aubrey-transcription)
+Aubrey-transcription [![Build Status](https://www.github.com/unt-libraries/aubrey-transcription/actions/workflows/test.yml/badge.svg?branch=master)](https://www.github.com/unt-libraries/aubrey-transcription/actions)
 ====================
 
 
@@ -15,8 +15,8 @@ structure.
 Requirements
 --------------------
 
-* Python 2.7, 3.4 - 3.7
-* Flask 1.0.2
+* Python 3.6 - 3.7
+* Flask 2.0.3
 * pypairtree 1.1.0
 
 
