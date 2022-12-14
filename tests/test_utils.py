@@ -5,7 +5,7 @@ import pytest
 import mock
 
 from aubrey_transcription.utils import (make_path, find_files, get_files_info, decrypt_filename,
-    assign_val_for_sorting)
+                                        assign_val_for_sorting)
 
 
 FILENAME_REGEX = re.compile(r'(?P<metaid>[^_]*)_(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
@@ -24,7 +24,8 @@ class TestMakePath():
 
 
 @mock.patch('aubrey_transcription.utils.os.path.isdir')
-@mock.patch('aubrey_transcription.utils.current_app', config={'PAIRTREE_BASE': '/right/here'})
+@mock.patch('aubrey_transcription.utils.current_app', config={
+    'PAIRTREE_BASE': '/right/here', 'FILENAME_REGEX': FILENAME_REGEX})
 class TestFindFiles():
     @pytest.mark.parametrize('dir_contents, expected', [
         (
@@ -32,18 +33,16 @@ class TestFindFiles():
             ['metadc977400_m1_1-subtitles-fre.vtt', 'metadc977400_m1_2-subtitles-eng.vtt']
         ),
         (['metadc977400_m1_1-subtitles-fre.vtt'], ['metadc977400_m1_1-subtitles-fre.vtt']),
-        ([],[]),
+        ([], []),
     ])
-    @mock.patch('aubrey_transcription.utils.sorted')
     @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_path_is_dir(self, mock_listdir, mock_sorted, mock_current_app, mock_isdir, dir_contents, expected):
+    def test_path_is_dir(self, mock_listdir, mock_current_app, mock_isdir,
+                         dir_contents, expected):
         pairpath = '/so/me/pa/th/somepath'
         mock_isdir.return_value = True
         mock_listdir.return_value = dir_contents
-        mock_sorted.return_value = expected
         result = find_files(pairpath)
         assert result == expected
-        mock_sorted.assert_called_once()
 
     @mock.patch('aubrey_transcription.utils.sorted')
     @mock.patch('aubrey_transcription.utils.os.listdir')
@@ -99,7 +98,7 @@ class TestGetFilesInfo():
     @mock.patch('aubrey_transcription.utils.assign_val_for_sorting')
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_returns_correct_info(self, mock_getsize, mock_assign_val_for_sorting,
-            mock_current_app, mock_decrypt_filename):
+                                  mock_current_app, mock_decrypt_filename):
         pairpath = '/pa/th/path'
         files = ['metaid_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {

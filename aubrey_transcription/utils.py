@@ -87,7 +87,8 @@ def get_files_info(pairpath, files):
             }
             files_info[filename_dict['manifestation']][filename_dict['fileset']].append(file_info)
     if files_info:
-        files_info[filename_dict['manifestation']][filename_dict['fileset']].sort(key=assign_val_for_sorting)
+        files_info[filename_dict['manifestation']][filename_dict['fileset']].sort(
+            key=assign_val_for_sorting)
 
     return files_info
 
