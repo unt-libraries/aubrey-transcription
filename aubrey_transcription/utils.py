@@ -23,8 +23,8 @@ def find_files(pairpath):
     files = os.listdir(normalized_path)
     try:
         # Sort the files numerically by the fileset number
-        return sorted(files, key=lambda f: int(f.split('-')[0].split('_')[-1]))
-    except ValueError:
+        return sorted(files, key=lambda f: int(decrypt_filename(f)['fileset']))
+    except (ValueError, KeyError):
         return files
 
 
