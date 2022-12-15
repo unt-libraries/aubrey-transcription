@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='aubrey-transcription',
-    version='1.0.0',
+    version='2.0.0',
     packages=find_packages(exclude=['tests']),
     description='Serves up transcriptions info for Aubrey.',
     long_description='See the GitHub page for more information.',
     include_package_data=True,
     install_requires=[
         'pypairtree==1.1.0',
-        'flask==1.0.2',
+        'flask==2.0.3',
     ],
     zip_safe=False,
     url='https://github.com/unt-libraries/aubrey-transcription',
