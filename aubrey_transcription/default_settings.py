@@ -9,3 +9,4 @@ EXTENSIONS_META = {
 }
 FILENAME_PATTERN = (r'(?P<metaid>[^_]*)_m?(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
                     r'-(?P<kind>[^-]*)-(?P<language>[^.]*)\.(?P<extension>.*)')
+JSON_SORT_KEYS = False

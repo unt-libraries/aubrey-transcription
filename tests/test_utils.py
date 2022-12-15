@@ -4,7 +4,8 @@ import re
 import pytest
 import mock
 
-from aubrey_transcription.utils import make_path, find_files, get_files_info, decrypt_filename
+from aubrey_transcription.utils import (make_path, find_files, get_files_info, decrypt_filename,
+                                        assign_val_for_sorting)
 
 
 FILENAME_REGEX = re.compile(r'(?P<metaid>[^_]*)_(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
@@ -23,19 +24,36 @@ class TestMakePath():
 
 
 @mock.patch('aubrey_transcription.utils.os.path.isdir')
-@mock.patch('aubrey_transcription.utils.current_app', config={'PAIRTREE_BASE': '/right/here'})
+@mock.patch('aubrey_transcription.utils.current_app', config={
+    'PAIRTREE_BASE': '/right/here', 'FILENAME_REGEX': FILENAME_REGEX})
 class TestFindFiles():
-    @pytest.mark.parametrize('expected', [
-        ['one.vtt'],
-        ['one.vtt', 'two.xml', 'three.jpg'],
-        [],
+    @pytest.mark.parametrize('dir_contents, expected', [
+        (
+            ['metadc977400_m1_2-subtitles-eng.vtt', 'metadc977400_m1_1-subtitles-fre.vtt'],
+            ['metadc977400_m1_1-subtitles-fre.vtt', 'metadc977400_m1_2-subtitles-eng.vtt']
+        ),
+        (['metadc977400_m1_1-subtitles-fre.vtt'], ['metadc977400_m1_1-subtitles-fre.vtt']),
+        ([], []),
     ])
     @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_path_is_dir(self, mock_listdir, mock_current_app, mock_isdir, expected):
+    def test_path_is_dir(self, mock_listdir, mock_current_app, mock_isdir,
+                         dir_contents, expected):
         pairpath = '/so/me/pa/th/somepath'
         mock_isdir.return_value = True
-        mock_listdir.return_value = expected
+        mock_listdir.return_value = dir_contents
         result = find_files(pairpath)
+        assert result == expected
+
+    @mock.patch('aubrey_transcription.utils.sorted')
+    @mock.patch('aubrey_transcription.utils.os.listdir')
+    def test_non_int_filename(self, mock_listdir, mock_sorted, mock_current_app, mock_isdir):
+        pairpath = '/so/me/pa/th/somepath'
+        mock_isdir.return_value = True
+        expected = ['one.vtt', 'two.xml', 'three.jpg']
+        mock_listdir.return_value = expected
+        mock_sorted.side_effect = ValueError
+        result = find_files(pairpath)
+        # When the sorting fails, we expect to get the files in the order listdir gave them
         assert result == expected
 
     def test_path_is_not_dir(self, mock_current_app, mock_isdir):
@@ -52,6 +70,24 @@ class TestFindFiles():
         assert mock_isdir.call_args[0][0].endswith(expected)
 
 
+class TestAssignValForSorting():
+    @pytest.mark.parametrize('item, expected_value', [
+        # Captions should show up first so it gets the 'a' prefix
+        ({'vtt_kind': 'captions', 'language': 'fre'}, 'afre'),
+        # English should sort before other languages, so replace with 'aaa'
+        ({'vtt_kind': 'thumbnails', 'language': 'eng'}, 'faaa'),
+        ({'vtt_kind': 'chapters', 'language': 'ger'}, 'cger'),
+        # Missing or unknown vtt kinds sort last
+        ({'language': 'spa'}, 'gspa'),
+        # Missing languages sort last
+        ({'vtt_kind': 'metadata'}, 'ezzz'),
+        ({}, 'gzzz'),
+    ])
+    def test_assigns_expected_values(self, item, expected_value):
+        actual_value = assign_val_for_sorting(item)
+        assert actual_value == expected_value
+
+
 @mock.patch('aubrey_transcription.utils.decrypt_filename')
 @mock.patch('aubrey_transcription.utils.current_app', config={
     'EXTENSIONS_META': {'vtt': {'mimetype': 'text/vtt', 'use': 'vtt'}},
@@ -59,8 +95,10 @@ class TestFindFiles():
     'TRANSCRIPTION_URL': 'http://example.com',
 })
 class TestGetFilesInfo():
+    @mock.patch('aubrey_transcription.utils.assign_val_for_sorting')
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
-    def test_returns_correct_info(self, mock_getsize, mock_current_app, mock_decrypt_filename):
+    def test_returns_correct_info(self, mock_getsize, mock_assign_val_for_sorting,
+                                  mock_current_app, mock_decrypt_filename):
         pairpath = '/pa/th/path'
         files = ['metaid_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {
@@ -86,6 +124,7 @@ class TestGetFilesInfo():
         }
         result = get_files_info(pairpath, files)
         assert result == expected
+        mock_assign_val_for_sorting.assert_called_once_with(expected['1']['1'][0])
 
     @pytest.mark.parametrize('transcription_url', [
         'http://example.com',
