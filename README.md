@@ -123,3 +123,5 @@ Contributors
 --------------------
 
 * [Gio Gottardi](https://github.com/somexpert)
+* [Gracie Flores-Hays](https://github.com/gracieflores)
+* [Lauren Ko](https://github.com/ldko)
