@@ -10,7 +10,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'pypairtree==1.1.0',
-        'flask==2.0.3',
+        'flask==2.3.2',
     ],
     zip_safe=False,
     url='https://github.com/unt-libraries/aubrey-transcription',
