@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from flask import Blueprint, jsonify
 
 from .utils import make_path, find_files, get_files_info

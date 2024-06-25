@@ -1,4 +1,5 @@
-import mock
+from unittest import mock
+
 import pytest
 
 from aubrey_transcription import create_app, default_settings

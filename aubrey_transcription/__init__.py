@@ -15,7 +15,8 @@ def create_app(test_config=None, instance_path=None):
     except OSError:
         pass
 
-    # Set configuration. Ascending priority is test_config, then config file, then default config.
+    # Set configuration. Values from the default config are replaced by any in the settings file,
+    # which in turn are replaced by any provided test_config values.
     app.config.from_object('aubrey_transcription.default_settings')  # Load default settings first.
     filename = os.path.join(app.instance_path, 'settings.py')
     app.config.from_pyfile(filename, silent=True)  # Override with settings file if it exists.
