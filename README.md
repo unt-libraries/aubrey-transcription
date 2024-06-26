@@ -15,7 +15,7 @@ structure.
 Requirements
 --------------------
 
-* Python 3.8 - 3.9
+* Python 3.8 - 3.12
 * Flask 3.0.3
 * pypairtree
 
