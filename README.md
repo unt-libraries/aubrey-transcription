@@ -74,43 +74,32 @@ directions to start developing/testing.
 
    Please see "default_settings.py" for an example of how a settings file should look.
 
-4. Set the following two environment variables so that Flask knows which app to run and
-   to do so in the "development" mode.
+4. Start the app.
     ```sh
-        $ export FLASK_APP=aubrey_transcription
-        $ export FLASK_ENV=development
+        $ flask --app aubrey-transcription run --debug
     ```
 
-5. Start the app.
-    ```sh
-        $ flask run
-    ```
-
-6. You may now visit the app by visiting the location given to you after running the
+5. You may now visit the app by visiting the location given to you after running the
    previous command, which should be something like "http://127.0.0.1:5000/identifier/",
    with "identifier" replaced by an existing identifier whose transcriptions can be found
    in your local pairtree.
 
-7. To run the test suite against your current version of Python (whatever is in your virtualenv),
+6. To run the test suite against your current version of Python (whatever is in your virtualenv),
    do the following, which will also generate the coverage report.
     ```sh
         coverage run -m pytest
     ```
 
-8. You may view the coverage report after running the tests.
+7. You may view the coverage report after running the tests.
     ```sh
         coverage report -m
     ```
 
-9. If you have multiple of the compatible versions of Python installed, then you can test against 
+8. If you have multiple of the compatible versions of Python installed, then you can test against
    them all with tox.
     ```sh
         tox
     ```
-
-
-Installation
---------------------
 
 
 License
