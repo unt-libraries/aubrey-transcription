@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='aubrey-transcription',
-    version='2.0.0',
+    version='3.0.0',
     packages=find_packages(exclude=['tests']),
     description='Serves up transcriptions info for Aubrey.',
     long_description='See the GitHub page for more information.',
     include_package_data=True,
     install_requires=[
-        'pypairtree==1.1.0',
-        'flask==2.0.3',
+        'pypairtree @ git+https://github.com/unt-libraries/pypairtree',
+        'flask~=3.0.3',
     ],
     zip_safe=False,
     url='https://github.com/unt-libraries/aubrey-transcription',
@@ -30,7 +30,10 @@ setup(
         'Environment :: Web Environment',
         'Framework :: Flask',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
 )

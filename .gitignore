@@ -9,3 +9,4 @@ build/
 instance/
 *.egg-info/
 env/
+.python-version

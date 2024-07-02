@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+3.0.0
+-----
+* Added support for Python 3.8 - 3.12
+* Dropped support for Python 3.6 and 3.7
+* Upgraded Flask to 3.0.3.
+* Upgraded pypairtree to GitHub repo's master branch.
+* Upgraded pytest (7.1.3), coverage (7.5.4), and tox(4.15.1).
+* Removed mock and future imports.
+
+
 2.0.0
 -----
 

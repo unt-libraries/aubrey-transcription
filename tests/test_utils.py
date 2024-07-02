@@ -1,15 +1,21 @@
-from __future__ import unicode_literals
-import re
+from unittest import mock
 
 import pytest
-import mock
 
 from aubrey_transcription.utils import (make_path, find_files, get_files_info, decrypt_filename,
                                         assign_val_for_sorting)
+from aubrey_transcription import create_app
+from aubrey_transcription.default_settings import FILENAME_PATTERN
 
 
-FILENAME_REGEX = re.compile(r'(?P<metaid>[^_]*)_(?P<manifestation>[^_]*)_(?P<fileset>[^-]*)'
-                            r'-(?P<kind>[^-]*)-(?P<language>[^.]*)\.(?P<extension>.*)')
+@pytest.fixture()
+def app():
+    app = create_app(test_config={
+        'PAIRTREE_BASE': '/some/path',
+        'FILENAME_PATTERN': FILENAME_PATTERN,
+        'EXTENSIONS_META': {'vtt': {'mimetype': 'text/vtt', 'use': 'vtt'}},
+        'TRANSCRIPTION_URL': 'http://example.com'})
+    return app
 
 
 class TestMakePath():
@@ -24,8 +30,6 @@ class TestMakePath():
 
 
 @mock.patch('aubrey_transcription.utils.os.path.isdir')
-@mock.patch('aubrey_transcription.utils.current_app', config={
-    'PAIRTREE_BASE': '/right/here', 'FILENAME_REGEX': FILENAME_REGEX})
 class TestFindFiles():
     @pytest.mark.parametrize('dir_contents, expected', [
         (
@@ -36,37 +40,41 @@ class TestFindFiles():
         ([], []),
     ])
     @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_path_is_dir(self, mock_listdir, mock_current_app, mock_isdir,
-                         dir_contents, expected):
+    def test_path_is_dir(self, mock_listdir, mock_isdir,
+                         app, dir_contents, expected):
         pairpath = '/so/me/pa/th/somepath'
         mock_isdir.return_value = True
         mock_listdir.return_value = dir_contents
-        result = find_files(pairpath)
+        with app.app_context():
+            result = find_files(pairpath)
         assert result == expected
 
     @mock.patch('aubrey_transcription.utils.sorted')
     @mock.patch('aubrey_transcription.utils.os.listdir')
-    def test_non_int_filename(self, mock_listdir, mock_sorted, mock_current_app, mock_isdir):
+    def test_non_int_filename(self, mock_listdir, mock_sorted, mock_isdir, app):
         pairpath = '/so/me/pa/th/somepath'
         mock_isdir.return_value = True
         expected = ['one.vtt', 'two.xml', 'three.jpg']
         mock_listdir.return_value = expected
         mock_sorted.side_effect = ValueError
-        result = find_files(pairpath)
+        with app.app_context():
+            result = find_files(pairpath)
         # When the sorting fails, we expect to get the files in the order listdir gave them
         assert result == expected
 
-    def test_path_is_not_dir(self, mock_current_app, mock_isdir):
+    def test_path_is_not_dir(self, mock_isdir, app):
         pairpath = '/so/me/fi/le/somefile'
         mock_isdir.return_value = False
-        result = find_files(pairpath)
+        with app.app_context():
+            result = find_files(pairpath)
         assert result == []
 
-    def test_path_normalized(self, mock_current_app, mock_isdir):
+    def test_path_normalized(self, mock_isdir, app):
         pairpath = '///so/./././////me//fi/le/////somefile//////'
         expected = '/so/me/fi/le/somefile'
         mock_isdir.return_value = False
-        find_files(pairpath)
+        with app.app_context():
+            find_files(pairpath)
         assert mock_isdir.call_args[0][0].endswith(expected)
 
 
@@ -89,16 +97,11 @@ class TestAssignValForSorting():
 
 
 @mock.patch('aubrey_transcription.utils.decrypt_filename')
-@mock.patch('aubrey_transcription.utils.current_app', config={
-    'EXTENSIONS_META': {'vtt': {'mimetype': 'text/vtt', 'use': 'vtt'}},
-    'PAIRTREE_BASE': '/some/path',
-    'TRANSCRIPTION_URL': 'http://example.com',
-})
 class TestGetFilesInfo():
     @mock.patch('aubrey_transcription.utils.assign_val_for_sorting')
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
     def test_returns_correct_info(self, mock_getsize, mock_assign_val_for_sorting,
-                                  mock_current_app, mock_decrypt_filename):
+                                  mock_decrypt_filename, app):
         pairpath = '/pa/th/path'
         files = ['metaid_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {
@@ -122,7 +125,8 @@ class TestGetFilesInfo():
                 ]
             }
         }
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert result == expected
         mock_assign_val_for_sorting.assert_called_once_with(expected['1']['1'][0])
 
@@ -131,9 +135,9 @@ class TestGetFilesInfo():
         'http://example.com/'
     ])
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
-    def test_flocat_has_single_slash(self, mock_getsize, mock_current_app, mock_decrypt_filename,
-                                     transcription_url):
-        mock_current_app.config[''] = transcription_url
+    def test_flocat_has_single_slash(self, mock_getsize, mock_decrypt_filename,
+                                     app, transcription_url):
+        app.config[''] = transcription_url
         pairpath = '/pa/th/path'
         files = ['metaid_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {
@@ -144,12 +148,13 @@ class TestGetFilesInfo():
         }
         mock_getsize.return_value = 256
         expected_flocat = 'http://example.com/pa/th/path/metaid_m1_1-captions-eng.vtt'
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert result['1']['1'][0]['flocat'] == expected_flocat
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
-    def test_manifestation_and_fileset_structure(self, mock_getsize, mock_current_app,
-                                                 mock_decrypt_filename):
+    def test_manifestation_and_fileset_structure(self, mock_getsize,
+                                                 mock_decrypt_filename, app):
         pairpath = '/pa/th/path'
         files = [
             'metaid_m1_8-captions-eng.vtt',
@@ -170,13 +175,14 @@ class TestGetFilesInfo():
             }
         ]
         mock_getsize.return_value = 256
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert result['1']['8']
         assert result['2']['5']
         assert not result['1']['1']
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
-    def test_removes_bad_extensions(self, mock_getsize, mock_current_app, mock_decrypt_filename):
+    def test_removes_bad_extensions(self, mock_getsize, mock_decrypt_filename, app):
         pairpath = '/pa/th/path'
         files = ['id_m1_1-captions-eng.vtt', 'id_m1_1-captions-ger.txt', 'id_m1_1-captions-fr.vtt']
         mock_decrypt_filename.return_value = {
@@ -186,13 +192,14 @@ class TestGetFilesInfo():
             'language': 'eng'
         }
         mock_getsize.return_value = 256
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert len(result['1']['1']) == 2
         assert result['1']['1'][0]['flocat'].endswith('.vtt')
         assert result['1']['1'][1]['flocat'].endswith('.vtt')
 
     @mock.patch('aubrey_transcription.utils.os.path.getsize')
-    def test_path_does_not_exist(self, mock_getsize, mock_current_app, mock_decrypt_filename):
+    def test_path_does_not_exist(self, mock_getsize, mock_decrypt_filename, app):
         pairpath = '/pa/th/path'
         files = ['id_m1_1-captions-eng.vtt']
         mock_decrypt_filename.return_value = {
@@ -202,48 +209,34 @@ class TestGetFilesInfo():
             'language': 'eng'
         }
         mock_getsize.side_effect = OSError
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert result == {}
 
     @pytest.mark.parametrize('files', [
         ['two'],
         ['two.vtt'],
     ])
-    def test_bad_filenames(self, mock_current_app, mock_decrypt_filename, files):
+    def test_bad_filenames(self, mock_decrypt_filename, app, files):
         pairpath = '/pa/th/path'
         mock_decrypt_filename.return_value = {}
-        result = get_files_info(pairpath, files)
+        with app.app_context():
+            result = get_files_info(pairpath, files)
         assert result == {}
 
 
-@mock.patch('aubrey_transcription.utils.current_app', config={'FILENAME_REGEX': FILENAME_REGEX})
 class TestDecryptFilename():
-    @pytest.mark.parametrize('filename,expected', [
-        (
-            'metaid_manifestation_fileset-kind-language.extension',
-            {
-                'metaid': 'metaid',
-                'manifestation': 'manifestation',
-                'fileset': 'fileset',
-                'kind': 'kind',
-                'language': 'language',
-                'extension': 'extension'
-            }
-        ),
-        (
-            'metadc12345_m1_1-captions-eng.vtt',
-            {
-                'metaid': 'metadc12345',
-                'manifestation': 'm1',
-                'fileset': '1',
-                'kind': 'captions',
-                'language': 'eng',
-                'extension': 'vtt'
-            }
-        ),
-    ])
-    def test_compliant_filename(self, mock_current_app, filename, expected):
-        result = decrypt_filename(filename)
+    def test_compliant_filename(self, app):
+        filename = 'metadc12345_m1_1-captions-eng.vtt'
+        expected = {
+            'metaid': 'metadc12345',
+            'manifestation': '1',
+            'fileset': '1',
+            'kind': 'captions',
+            'language': 'eng',
+            'extension': 'vtt'}
+        with app.app_context():
+            result = decrypt_filename(filename)
         assert result == expected
 
     @pytest.mark.parametrize('filename', [
@@ -251,6 +244,7 @@ class TestDecryptFilename():
         'bad',
         'this_is_missing-an-extension',
     ])
-    def test_noncompliant_filename(self, mock_current_app, filename):
-        result = decrypt_filename(filename)
+    def test_noncompliant_filename(self, app, filename):
+        with app.app_context():
+            result = decrypt_filename(filename)
         assert result == {}
