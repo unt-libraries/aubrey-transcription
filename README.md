@@ -1,4 +1,4 @@
-Aubrey-transcription [![Build Status](https://www.github.com/unt-libraries/aubrey-transcription/actions/workflows/test.yml/badge.svg?branch=master)](https://www.github.com/unt-libraries/aubrey-transcription/actions)
+Aubrey-transcription [![aubrey-transcriptions test status](https://github.com/unt-libraries/aubrey-transcription/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/unt-libraries/aubrey-transcription/actions)
 ====================
 
 
