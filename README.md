@@ -76,7 +76,7 @@ directions to start developing/testing.
 
 4. Start the app.
     ```sh
-        $ flask --app aubrey-transcription run --debug
+        $ flask --app aubrey_transcription run --debug
     ```
 
 5. You may now visit the app by visiting the location given to you after running the
